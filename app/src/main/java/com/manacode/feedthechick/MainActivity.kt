@@ -4,28 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.manacode.eggmagnet.audio.AudioController
-import com.manacode.eggmagnet.ui.main.menuscreen.AppRoot
+import com.manacode.feedthechick.ui.main.root.AppRoot
 import com.manacode.feedthechick.ui.theme.FeedtheChickTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-// MainActivity.kt
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var audio: AudioController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -34,7 +21,9 @@ class MainActivity : ComponentActivity() {
         hideSystemBars()
 
         setContent {
-            AppRoot()
+            FeedtheChickTheme {
+                AppRoot()
+            }
         }
     }
 
@@ -43,19 +32,10 @@ class MainActivity : ComponentActivity() {
         if (hasFocus) hideSystemBars()
     }
 
-    override fun onPause() {
-        audio.pauseMusic()
-        super.onPause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        audio.resumeMusic()
-    }
-
     private fun hideSystemBars() {
-        val c = WindowInsetsControllerCompat(window, window.decorView)
-        c.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        c.hide(WindowInsetsCompat.Type.systemBars())
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.hide(WindowInsetsCompat.Type.systemBars())
     }
 }

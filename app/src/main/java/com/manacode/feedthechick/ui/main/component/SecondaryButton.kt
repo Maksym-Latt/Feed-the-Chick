@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.component
+package com.manacode.feedthechick.ui.main.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background

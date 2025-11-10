@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.settings
+package com.manacode.feedthechick.ui.main.settings
 
 data class SettingsUiState(
     val musicVolume: Int = 70,

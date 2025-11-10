@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.gamescreen
+package com.manacode.feedthechick.ui.main.gamescreen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -27,11 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.manacode.eggmagnet.R
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedTextShort
-import com.manacode.eggmagnet.ui.main.component.OrangePrimaryButton
-import com.manacode.eggmagnet.ui.main.component.StartPrimaryButton
+import com.manacode.feedthechick.R
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedTextShort
+import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
+import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 
 @Composable
 fun WinOverlay(
