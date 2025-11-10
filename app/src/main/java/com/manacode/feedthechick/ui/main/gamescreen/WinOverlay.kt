@@ -40,7 +40,7 @@ fun WinOverlay(
     onOpenMagnetShop: () -> Unit,
     onPlayAgain: () -> Unit,
     onMenu: () -> Unit,
-    @DrawableRes chickenRes: Int = R.drawable.win_chicken
+    @DrawableRes chickenRes: Int = R.drawable.ic_launcher_foreground
 ) {
     Box(
         Modifier

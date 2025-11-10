@@ -22,7 +22,7 @@ internal fun SplashScreen(progress: Float) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.bg_loading),
+            painter = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop

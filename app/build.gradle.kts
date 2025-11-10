@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.manacode.feedthechick"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.manacode.feedthechick"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
