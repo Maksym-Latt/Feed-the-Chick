@@ -1,16 +1,14 @@
 package com.manacode.feedthechick.ui.main.menuscreen
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -19,14 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.manacode.feedthechick.ui.main.component.FarmBackground
-import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.R
 import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 
@@ -37,7 +35,12 @@ fun MenuScreen(
     onOpenSettings: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        FarmBackground(modifier = Modifier.matchParentSize())
+        Image(
+            painter = painterResource(id = R.drawable.bg_menu),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
 
         SecondaryIconButton(
             onClick = onOpenSettings,
@@ -60,7 +63,21 @@ fun MenuScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LogoTitle()
+            Image(
+                painter = painterResource(id = R.drawable.title),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(0.8f),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.chicken_win),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(0.65f),
+                contentScale = ContentScale.Fit
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -96,44 +113,5 @@ fun MenuScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun LogoTitle() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(68.dp)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color(0xFFFFF176), Color(0xFFFFD54F), Color(0xFFFFB300)),
-                            radius = 100f
-                        ),
-                        shape = MaterialTheme.shapes.large
-                    )
-            )
-            GradientOutlinedText(
-                text = "Feed the Chick",
-                fontSize = 42.sp,
-                gradientColors = listOf(Color(0xFFFFF4C2), Color(0xFFFFC66E))
-            )
-        }
-
-        Text(
-            text = "Двір ферми чекає на турботливого гравця!",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = Color(0xFF8C5A2E),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
-        )
     }
 }
