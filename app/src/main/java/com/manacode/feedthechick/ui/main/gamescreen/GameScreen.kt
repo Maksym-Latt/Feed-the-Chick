@@ -4,9 +4,10 @@ import android.media.AudioManager
 import android.media.ToneGenerator
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,13 +24,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,23 +43,23 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.manacode.feedthechick.ui.main.component.FarmBackground
+import androidx.annotation.DrawableRes
+import com.manacode.feedthechick.R
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
 import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
@@ -66,6 +67,8 @@ import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import kotlin.random.Random
+
+private const val TARGET_SCORE = 10
 
 @Composable
 fun GameScreen(
@@ -75,12 +78,14 @@ fun GameScreen(
     var lives by remember { mutableIntStateOf(3) }
     var running by remember { mutableStateOf(false) }
     var showIntro by remember { mutableStateOf(true) }
-    var showGameOver by remember { mutableStateOf(false) }
+    var showWinOverlay by remember { mutableStateOf(false) }
     var showSettingsOverlay by remember { mutableStateOf(false) }
     var spawnDelay by remember { mutableLongStateOf(1600L) }
     val items = remember { mutableStateListOf<SpawnedItem>() }
     var nextItemId by remember { mutableIntStateOf(0) }
     var resetKey by remember { mutableIntStateOf(0) }
+    var chickState by remember { mutableStateOf(ChickState.Idle) }
+    val targetScore = TARGET_SCORE
 
     val toneGenerator = remember {
         ToneGenerator(AudioManager.STREAM_MUSIC, 70)
@@ -93,29 +98,43 @@ fun GameScreen(
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP2, 150)
     }
 
+    LaunchedEffect(chickState, showWinOverlay) {
+        if (!showWinOverlay && chickState != ChickState.Idle) {
+            delay(1000)
+            chickState = ChickState.Idle
+        }
+    }
+
     fun resetGame() {
         items.clear()
         lives = 3
         score = 0
         spawnDelay = 1600L
         showIntro = false
-        showGameOver = false
+        showWinOverlay = false
         showSettingsOverlay = false
         running = true
         resetKey++
+        chickState = ChickState.Idle
     }
 
     fun finishGame() {
         running = false
-        showGameOver = true
+        showWinOverlay = true
         items.clear()
         showSettingsOverlay = false
     }
 
     fun registerMistake() {
         lives = (lives - 1).coerceAtLeast(0)
+        chickState = ChickState.Cry
         if (lives <= 0) {
-            finishGame()
+            running = false
+            items.clear()
+            showSettingsOverlay = false
+            showIntro = true
+            showWinOverlay = false
+            onExitToMenu(score)
         }
     }
 
@@ -123,12 +142,16 @@ fun GameScreen(
         score += 1
         spawnDelay = maxOf(520L, (spawnDelay * 0.92f).toLong())
         playCluck()
+        chickState = ChickState.Happy
+        if (score >= targetScore) {
+            finishGame()
+        }
     }
 
     BackHandler(enabled = true) {
         if (showSettingsOverlay) {
             showSettingsOverlay = false
-            if (!showIntro && !showGameOver) {
+            if (!showIntro && !showWinOverlay) {
                 running = true
             }
         } else {
@@ -187,7 +210,12 @@ fun GameScreen(
                 }
             }
 
-            FarmBackground(modifier = Modifier.matchParentSize())
+            Image(
+                painter = painterResource(id = R.drawable.bg_game),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop
+            )
 
             Column(
                 modifier = Modifier
@@ -218,7 +246,7 @@ fun GameScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Scoreboard(score = score, lives = lives)
+                Scoreboard(score = score, targetScore = targetScore, lives = lives)
             }
 
             Chick(
@@ -226,6 +254,7 @@ fun GameScreen(
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 40.dp)
                     .size(fieldWidth * 0.7f),
+                state = chickState,
                 onMouthMeasured = { mouthBounds = it }
             )
 
@@ -246,9 +275,6 @@ fun GameScreen(
                                 if (releasedItem.type == ItemType.Seed) {
                                     registerMistake()
                                 }
-                            }
-                            if (!running && !showGameOver) {
-                                finishGame()
                             }
                         }
                     )
@@ -271,7 +297,7 @@ fun GameScreen(
                 GameSettingsOverlay(
                     onResume = {
                         showSettingsOverlay = false
-                        if (!showIntro && !showGameOver) {
+                        if (!showIntro && !showWinOverlay) {
                             running = true
                         }
                     },
@@ -288,12 +314,13 @@ fun GameScreen(
             }
 
             AnimatedVisibility(
-                visible = showGameOver,
+                visible = showWinOverlay,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                GameOverOverlay(
+                GameWinOverlay(
                     score = score,
+                    targetScore = targetScore,
                     onRetry = { resetGame() },
                     onExit = {
                         running = false
@@ -314,10 +341,14 @@ private data class SpawnedItem(
     val spawnedAt: Long,
 )
 
-private enum class ItemType(val size: androidx.compose.ui.unit.Dp) {
-    Seed(54.dp),
-    Rock(60.dp),
-    Frog(66.dp);
+private enum class ItemType(
+    val size: androidx.compose.ui.unit.Dp,
+    @DrawableRes val drawableRes: Int,
+    val contentDescription: String,
+) {
+    Seed(72.dp, R.drawable.item_gold_corn, "Golden corn"),
+    Rock(72.dp, R.drawable.item_stone, "Stone"),
+    Frog(86.dp, R.drawable.item_frog, "Frog");
 
     companion object {
         fun random(): ItemType {
@@ -331,41 +362,29 @@ private enum class ItemType(val size: androidx.compose.ui.unit.Dp) {
     }
 }
 
+private enum class ChickState { Idle, Happy, Cry }
+
 @Composable
-private fun Scoreboard(score: Int, lives: Int) {
+private fun Scoreboard(score: Int, targetScore: Int, lives: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         GradientOutlinedText(
-            text = "Seeds Fed: $score",
+            text = "Corn fed: $score / $targetScore",
             fontSize = 28.sp,
-            gradientColors = listOf(Color(0xFFFFF3C1), Color(0xFFFFC86B))
+            gradientColors = listOf(Color(0xFFFFF4C2), Color(0xFFFFC66E))
         )
         Spacer(modifier = Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             repeat(3) { index ->
-                EggIcon(filled = index < lives)
+                val filled = index < lives
+                Image(
+                    painter = painterResource(id = R.drawable.item_egg),
+                    contentDescription = if (filled) "Life" else "Lost life",
+                    modifier = Modifier
+                        .size(44.dp)
+                        .graphicsLayer(alpha = if (filled) 1f else 0.35f),
+                    contentScale = ContentScale.Fit
+                )
             }
-        }
-    }
-}
-
-@Composable
-private fun EggIcon(filled: Boolean) {
-    Box(
-        modifier = Modifier
-            .size(30.dp, 40.dp)
-            .shadow(8.dp, shape = CircleShape, clip = false)
-            .clip(CircleShape)
-            .background(if (filled) Color(0xFFFFF6DB) else Color(0x55FFFFFF)),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        if (filled) {
-            Box(
-                modifier = Modifier
-                    .size(16.dp, 8.dp)
-                    .offset(y = (-4).dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFFFD180))
-            )
         }
     }
 }
@@ -373,39 +392,33 @@ private fun EggIcon(filled: Boolean) {
 @Composable
 private fun Chick(
     modifier: Modifier,
+    state: ChickState,
     onMouthMeasured: (Rect) -> Unit,
 ) {
     val density = LocalDensity.current
+    val imageRes = when (state) {
+        ChickState.Idle -> R.drawable.chicken_idle
+        ChickState.Happy -> R.drawable.chicken_happy
+        ChickState.Cry -> R.drawable.chicken_cry
+    }
 
     Box(modifier = modifier) {
-        androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
-            val bodyCenter = Offset(size.width / 2f, size.height * 0.6f)
-            val bodyRadius = size.minDimension * 0.35f
-            drawCircle(color = Color(0xFFFFE173), radius = bodyRadius, center = bodyCenter)
-            val headRadius = size.minDimension * 0.26f
-            drawCircle(color = Color(0xFFFFEB8A), radius = headRadius, center = Offset(size.width / 2f, size.height * 0.37f))
-            drawCircle(color = Color(0xFFFFF7C8), radius = headRadius * 0.4f, center = Offset(size.width * 0.45f, size.height * 0.32f))
-            drawCircle(color = Color(0xFFFFF7C8), radius = headRadius * 0.4f, center = Offset(size.width * 0.55f, size.height * 0.32f))
-            drawCircle(color = Color.Black.copy(alpha = 0.8f), radius = headRadius * 0.14f, center = Offset(size.width * 0.45f, size.height * 0.32f))
-            drawCircle(color = Color.Black.copy(alpha = 0.8f), radius = headRadius * 0.14f, center = Offset(size.width * 0.55f, size.height * 0.32f))
-            drawCircle(color = Color.White.copy(alpha = 0.8f), radius = headRadius * 0.05f, center = Offset(size.width * 0.47f, size.height * 0.30f))
-            drawCircle(color = Color.White.copy(alpha = 0.8f), radius = headRadius * 0.05f, center = Offset(size.width * 0.57f, size.height * 0.30f))
-            drawCircle(color = Color(0xFFFFE173).copy(alpha = 0.85f), radius = bodyRadius * 0.7f, center = Offset(size.width * 0.33f, size.height * 0.65f))
-            drawCircle(color = Color(0xFFFFE173).copy(alpha = 0.85f), radius = bodyRadius * 0.7f, center = Offset(size.width * 0.67f, size.height * 0.65f))
-            drawCircle(color = Color(0xFFFFF3B0), radius = size.minDimension * 0.12f, center = Offset(size.width * 0.35f, size.height * 0.43f))
-            drawCircle(color = Color(0xFFFFF3B0), radius = size.minDimension * 0.12f, center = Offset(size.width * 0.65f, size.height * 0.43f))
-        }
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = "Chicken",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
 
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
-                .offset(y = 12.dp)
-                .size(width = 140.dp, height = 62.dp)
-                .clip(androidx.compose.foundation.shape.RoundedCornerShape(40.dp))
-                .background(Color(0xFFFFA726))
+                .offset(y = 8.dp)
+                .fillMaxWidth(0.36f)
+                .aspectRatio(2.8f)
                 .onGloballyPositioned { layout ->
                     val bounds = layout.boundsInRoot()
-                    val extra = with(density) { 16.dp.toPx() }
+                    val extra = with(density) { 12.dp.toPx() }
                     val expanded = Rect(
                         left = bounds.left - extra,
                         top = bounds.top - extra,
@@ -414,15 +427,6 @@ private fun Chick(
                     )
                     onMouthMeasured(expanded)
                 }
-        )
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .offset(y = 12.dp)
-                .size(width = 90.dp, height = 32.dp)
-                .clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
-                .background(Color(0xFFFFCC80))
         )
     }
 }
@@ -468,45 +472,12 @@ private fun DraggableItem(
             )
         }
 
-    Box(modifier = dragModifier) {
-        when (item.type) {
-            ItemType.Seed -> SeedItem(isDragging)
-            ItemType.Rock -> RockItem(isDragging)
-            ItemType.Frog -> FrogItem(isDragging)
-        }
-    }
-}
-
-@Composable
-private fun SeedItem(isDragging: Boolean) {
-    val baseColor = if (isDragging) Color(0xFFFFD54F) else Color(0xFFFFE082)
-    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-        drawCircle(color = baseColor)
-        drawCircle(color = Color(0xFFFFC107), radius = size.minDimension / 2.6f, center = Offset(size.width * 0.45f, size.height * 0.42f))
-    }
-}
-
-@Composable
-private fun RockItem(isDragging: Boolean) {
-    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-        val rockColor = if (isDragging) Color(0xFF8D6E63) else Color(0xFF9E8E89)
-        drawRoundRect(color = rockColor, cornerRadius = androidx.compose.ui.geometry.CornerRadius(32f, 32f))
-        drawRect(color = Color(0xFFBCAAA4), topLeft = Offset(size.width * 0.2f, size.height * 0.2f), size = Size(size.width * 0.35f, size.height * 0.25f))
-    }
-}
-
-@Composable
-private fun FrogItem(isDragging: Boolean) {
-    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-        val bodyColor = if (isDragging) Color(0xFF81C784) else Color(0xFFA5D6A7)
-        drawRoundRect(color = bodyColor, cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.minDimension / 2, size.minDimension / 2))
-        val eyeRadius = size.minDimension * 0.15f
-        drawCircle(color = Color.White, radius = eyeRadius, center = Offset(size.width * 0.3f, size.height * 0.3f))
-        drawCircle(color = Color.White, radius = eyeRadius, center = Offset(size.width * 0.7f, size.height * 0.3f))
-        drawCircle(color = Color.Black, radius = eyeRadius * 0.4f, center = Offset(size.width * 0.3f, size.height * 0.3f))
-        drawCircle(color = Color.Black, radius = eyeRadius * 0.4f, center = Offset(size.width * 0.7f, size.height * 0.3f))
-        drawOval(color = Color(0xFF66BB6A), topLeft = Offset(size.width * 0.25f, size.height * 0.6f), size = Size(size.width * 0.5f, size.height * 0.3f))
-    }
+    Image(
+        painter = painterResource(id = item.type.drawableRes),
+        contentDescription = item.type.contentDescription,
+        modifier = dragModifier.graphicsLayer { alpha = if (isDragging) 0.85f else 1f },
+        contentScale = ContentScale.Fit
+    )
 }
 
 @Composable
@@ -545,7 +516,12 @@ private fun IntroOverlay(onStart: () -> Unit) {
 }
 
 @Composable
-private fun GameOverOverlay(score: Int, onRetry: () -> Unit, onExit: () -> Unit) {
+private fun GameWinOverlay(
+    score: Int,
+    targetScore: Int,
+    onRetry: () -> Unit,
+    onExit: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -561,16 +537,29 @@ private fun GameOverOverlay(score: Int, onRetry: () -> Unit, onExit: () -> Unit)
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             GradientOutlinedText(
-                text = "You Fed $score seeds!",
-                fontSize = 30.sp,
+                text = "Перемога!",
+                fontSize = 34.sp,
                 gradientColors = listOf(Color(0xFFFFF7C1), Color(0xFFFFC86B))
             )
-            Text(
-                text = "Хочеш спробувати ще раз?",
-                style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF704117))
+
+            Image(
+                painter = painterResource(id = R.drawable.chicken_win),
+                contentDescription = "Happy chicken",
+                modifier = Modifier.fillMaxWidth(0.7f),
+                contentScale = ContentScale.Fit
             )
+
+            Text(
+                text = "Ти нагодував курча $score/$targetScore зернят!",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = Color(0xFF704117),
+                    textAlign = TextAlign.Center
+                ),
+                textAlign = TextAlign.Center
+            )
+
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                OrangePrimaryButton(text = "Retry", onClick = onRetry)
+                OrangePrimaryButton(text = "Ще раз", onClick = onRetry)
                 OrangePrimaryButton(text = "Меню", onClick = onExit)
             }
         }
