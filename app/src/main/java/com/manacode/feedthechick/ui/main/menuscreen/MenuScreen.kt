@@ -11,9 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -24,15 +32,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manacode.feedthechick.ui.main.component.FarmBackground
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 
 @Composable
 fun MenuScreen(
     onStartGame: () -> Unit,
-    lastScore: Int?
+    lastScore: Int?,
 ) {
+    var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showPrivacy by rememberSaveable { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         FarmBackground(modifier = Modifier.matchParentSize())
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 24.dp, end = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            SecondaryIconButton(onClick = { showPrivacy = true }) {
+                Icon(Icons.Default.Info, contentDescription = null, tint = Color.White)
+            }
+            SecondaryIconButton(onClick = { showSettings = true }) {
+                Icon(Icons.Default.Settings, contentDescription = null, tint = Color.White)
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -77,6 +103,20 @@ fun MenuScreen(
                 )
             }
         }
+    }
+
+    if (showSettings) {
+        SettingsOverlay(
+            onClose = { showSettings = false },
+            onPrivacy = {
+                showSettings = false
+                showPrivacy = true
+            }
+        )
+    }
+
+    if (showPrivacy) {
+        PrivacyOverlay(onClose = { showPrivacy = false })
     }
 }
 

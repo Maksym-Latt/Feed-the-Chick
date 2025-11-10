@@ -23,6 +23,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,6 +62,7 @@ import androidx.compose.ui.zIndex
 import com.manacode.feedthechick.ui.main.component.FarmBackground
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
+import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -175,14 +180,34 @@ fun GameScreen(
 
             FarmBackground(modifier = Modifier.matchParentSize())
 
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
                     .padding(horizontal = 24.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Scoreboard(score = score, lives = lives)
+                SecondaryIconButton(onClick = {
+                    val finalScore = score
+                    running = false
+                    items.clear()
+                    showGameOver = false
+                    onExitToMenu(finalScore)
+                }) {
+                    Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
+                }
+
+                Scoreboard(
+                    score = score,
+                    lives = lives,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 24.dp)
+                )
+
+                SecondaryIconButton(onClick = { resetGame() }) {
+                    Icon(Icons.Default.Refresh, contentDescription = null, tint = Color.White)
+                }
             }
 
             Chick(
@@ -190,7 +215,11 @@ fun GameScreen(
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 40.dp)
                     .size(fieldWidth * 0.7f),
-                onMouthMeasured = { mouthBounds = it }
+                onMouthMeasured = { layoutBounds ->
+                    val horizontalPadding = with(density) { 32.dp.toPx() }
+                    val verticalPadding = with(density) { 20.dp.toPx() }
+                    mouthBounds = layoutBounds.expand(horizontalPadding, verticalPadding)
+                }
             )
 
             items.forEach { item ->
@@ -271,9 +300,18 @@ private enum class ItemType(val size: androidx.compose.ui.unit.Dp) {
     }
 }
 
+private fun Rect.expand(horizontal: Float, vertical: Float): Rect {
+    val hx = horizontal.coerceAtLeast(0f)
+    val vy = vertical.coerceAtLeast(0f)
+    return Rect(left - hx, top - vy, right + hx, bottom + vy)
+}
+
 @Composable
-private fun Scoreboard(score: Int, lives: Int) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun Scoreboard(score: Int, lives: Int, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         GradientOutlinedText(
             text = "Seeds Fed: $score",
             fontSize = 28.sp,

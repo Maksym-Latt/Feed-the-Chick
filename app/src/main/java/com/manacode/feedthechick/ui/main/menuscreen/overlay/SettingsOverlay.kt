@@ -1,40 +1,39 @@
 package com.manacode.feedthechick.ui.main.menuscreen
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
-import kotlin.math.roundToInt
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedTextShort
+import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
 import com.manacode.feedthechick.ui.main.component.SecondaryBackButton
 import com.manacode.feedthechick.ui.main.settings.SettingsViewModel
-import kotlin.math.max
 
 @Composable
 fun SettingsOverlay(
@@ -57,61 +56,52 @@ fun SettingsOverlay(
         SecondaryBackButton(
             onClick = onClose,
             modifier = Modifier
-                .padding(start = 16.dp, top = 24.dp)
-
+                .padding(start = 16.dp, top = 24.dp),
         )
 
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
                 .width(300.dp)
-                .wrapContentHeight()
                 .clip(cardShape)
-                .background(Color(0xFF3DE3F8))
-                .border(2.dp, Color(0xFF101010), cardShape)
-                .padding(vertical = 20.dp, horizontal = 16.dp)
+                .background(Color(0xFFE6FAFF))
+                .border(2.dp, Color(0xFF10829A), cardShape)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {}
+                .padding(vertical = 24.dp, horizontal = 20.dp)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 GradientOutlinedText(
                     text = "Settings",
                     fontSize = 28.sp,
-                    gradientColors = listOf(Color(0xFFFFFFFF), Color(0xFFFFFFFF)),
+                    gradientColors = listOf(Color.White, Color.White)
                 )
+
+                Spacer(Modifier.height(16.dp))
+
+                SettingSwitchRow(
+                    title = "Music",
+                    checked = ui.musicVolume > 0,
+                    onCheckedChange = viewModel::setMusicEnabled
+                )
+
                 Spacer(Modifier.height(12.dp))
 
-                LabeledSlider(
-                    title = "Volume",
-                    value = ui.musicVolume,
-                    onChange = viewModel::setMusicVolume,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                LabeledSlider(
+                SettingSwitchRow(
                     title = "Sound",
-                    value = ui.soundVolume,
-                    onChange = viewModel::setSoundVolume,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
+                    checked = ui.soundVolume > 0,
+                    onCheckedChange = viewModel::setSoundEnabled
                 )
 
-                Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(28.dp))
 
                 OrangePrimaryButton(
-                    text = "Privacy",
+                    text = "Privacy Policy",
                     onClick = onPrivacy,
                     modifier = Modifier.fillMaxWidth(0.85f)
                 )
@@ -120,118 +110,48 @@ fun SettingsOverlay(
     }
 }
 
-/* ---------- Слайдер с заголовком ---------- */
 @Composable
-public fun LabeledSlider(
+private fun SettingSwitchRow(
     title: String,
-    value: Int,                 // 0..100
-    onChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
-    Column(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    val shape = RoundedCornerShape(16.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Color(0xFFECFDFF))
+            .border(1.dp, Color(0xFF93E9F6), shape)
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
             GradientOutlinedTextShort(
                 text = title,
-                fontSize = 18.sp,
-                gradientColors = listOf(Color(0xFFFFFFFF), Color(0xFFFFFFFF)),
+                fontSize = 20.sp,
+                gradientColors = listOf(Color(0xFF132E35), Color(0xFF132E35)),
+                horizontalPadding = 0.dp
             )
-            GradientOutlinedText(
-                text = "${value}%",
-                fontSize = 18.sp,
-                gradientColors = listOf(Color(0xFFFFFFFF), Color(0xFFFFFFFF)),
+            Text(
+                text = if (checked) "Enabled" else "Muted",
+                color = Color(0xFF0E3E49),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
-        Spacer(Modifier.height(6.dp))
 
-        OrangeSlider(
-            value = value,
-            onValueChange = onChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(22.dp)
+        Spacer(Modifier.width(12.dp))
+
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color(0xFF00C4A2),
+                checkedTrackColor = Color(0xFF8CFFE9),
+                uncheckedThumbColor = Color(0xFF8CA9B0),
+                uncheckedTrackColor = Color(0xFFC7E3E8)
+            )
         )
-    }
-}
-
-@Composable
-private fun OrangeSlider(
-    value: Int,                 // 0..100
-    onValueChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val clamped = value.coerceIn(0, 100)
-    val heightDp = 22.dp
-    val radius by remember { mutableStateOf(heightDp / 2) }
-
-    // жесты: тап + перетягивание
-    var widthPx by remember { mutableStateOf(1f) }
-    val density = LocalDensity.current
-
-    fun xToValue(x: Float): Int {
-        val padPx = with(density) { 0.dp.toPx() }
-        val w = (widthPx - padPx * 2).coerceAtLeast(1f)
-        val v = ((x - padPx).coerceIn(0f, w) / w) * 100f
-        return v.roundToInt().coerceIn(0, 100)
-    }
-
-    val dragModifier = Modifier
-        .pointerInput(Unit) {
-            detectTapGestures { offset ->
-                onValueChange(xToValue(offset.x))
-            }
-        }
-        .pointerInput(Unit) {
-            detectDragGestures(
-                onDrag = { change, _ ->
-                    onValueChange(xToValue(change.position.x))
-                }
-            )
-        }
-
-    Box(
-        modifier = modifier
-            .onGloballyPositioned { widthPx = it.size.width.toFloat() }
-            .then(dragModifier)
-    ) {
-        Canvas(Modifier.fillMaxSize()) {
-            val r = size.height / 2f
-
-            drawRoundRect(
-                color = Color(0xFF595B60),
-                cornerRadius = CornerRadius(r, r)
-            )
-
-            val fillW = max(size.height, size.width * (clamped / 100f))
-
-            drawRoundRect(
-                brush = Brush.horizontalGradient(
-                    listOf(Color(0xFFFFB74D), Color(0xFFFF8F00))
-                ),
-                size = androidx.compose.ui.geometry.Size(fillW, size.height),
-                cornerRadius = CornerRadius(r, r)
-            )
-
-            drawRoundRect(
-                brush = Brush.verticalGradient(
-                    0f to Color.White.copy(alpha = 0.35f),
-                    0.55f to Color.Transparent
-                ),
-                size = androidx.compose.ui.geometry.Size(fillW, size.height),
-                cornerRadius = CornerRadius(r, r)
-            )
-
-            val thumbX = fillW.coerceIn(r, size.width - r)
-            drawCircle(
-                color = Color.White,
-                radius = r * 0.35f,
-                center = Offset(thumbX - r * 0.65f, size.height / 2f)
-            )
-        }
     }
 }
