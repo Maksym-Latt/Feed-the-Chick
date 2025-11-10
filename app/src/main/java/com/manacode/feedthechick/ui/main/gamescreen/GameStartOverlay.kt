@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.gamescreen
+package com.manacode.feedthechick.ui.main.gamescreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import androidx.compose.ui.unit.dp
 
 @Composable

@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.gamescreen
+package com.manacode.feedthechick.ui.main.gamescreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,13 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
-import com.manacode.eggmagnet.ui.main.component.OrangePrimaryButton
-import com.manacode.eggmagnet.ui.main.settings.SettingsViewModel
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
+import com.manacode.feedthechick.ui.main.settings.SettingsViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import com.manacode.eggmagnet.ui.main.component.SecondaryIconButton
-import com.manacode.eggmagnet.ui.main.menuscreen.LabeledSlider
+import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
+import com.manacode.feedthechick.ui.main.menuscreen.LabeledSlider
 
 @Composable
 fun GameSettingsOverlay(

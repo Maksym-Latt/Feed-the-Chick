@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.menuscreen
+package com.manacode.feedthechick.ui.main.menuscreen
 
 import android.content.Intent
 import android.net.Uri
@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
-import com.manacode.eggmagnet.ui.main.component.OrangePrimaryButton
-import com.manacode.eggmagnet.ui.main.component.SecondaryBackButton
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
+import com.manacode.feedthechick.ui.main.component.SecondaryBackButton
 
 @Composable
 fun PrivacyOverlay(

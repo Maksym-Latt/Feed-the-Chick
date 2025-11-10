@@ -1,152 +1,121 @@
-package com.manacode.eggmagnet.ui.main.menuscreen
+package com.manacode.feedthechick.ui.main.menuscreen
 
-import android.graphics.Typeface
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Leaderboard
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.res.ResourcesCompat
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
-import com.manacode.eggmagnet.ui.main.component.SecondaryIconButton
-import com.manacode.eggmagnet.ui.main.component.StartPrimaryButton
+import com.manacode.feedthechick.ui.main.component.FarmBackground
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 
 @Composable
 fun MenuScreen(
     onStartGame: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenTop: () -> Unit,
-    onOpenMagnetShop: () -> Unit,
-    playerVm: PlayerViewModel = hiltViewModel()
+    lastScore: Int?
 ) {
-    val p by playerVm.ui.collectAsStateWithLifecycle()
-    MenuScreenUI(
-        onStartGame = onStartGame,
-        onOpenSettings = onOpenSettings,
-        onOpenTop = onOpenTop,
-        onOpenMagnetShop = onOpenMagnetShop,
-        gameLevel = p.gameLevel
-    )
-}
-
-@Composable
-private fun MenuScreenUI(
-    onStartGame: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenTop: () -> Unit,
-    onOpenMagnetShop: () -> Unit,
-    gameLevel: Int
-) {
-    Box(Modifier.fillMaxSize()) {
-
-        Box(Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(start = 16.dp, top = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                SecondaryIconButton(onClick = onOpenTop) {
-                    Icon(
-                        imageVector = Icons.Filled.Leaderboard,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize(0.9f)
-                    )
-                }
-            }
-
-            SecondaryIconButton(
-                onClick = onOpenSettings,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 16.dp, top = 24.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Tune,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.fillMaxSize(0.9f)
-                )
-            }
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
+        FarmBackground(modifier = Modifier.matchParentSize())
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(horizontal = 32.dp, vertical = 48.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            GameTitle(modifier = Modifier.padding(bottom = 24.dp))
+            LogoTitle()
+
+            Spacer(modifier = Modifier.height(32.dp))
 
             StartPrimaryButton(
-                text = "START",
+                text = "Play",
                 onClick = onStartGame,
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
-                    .height(56.dp)
+                    .height(60.dp)
             )
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            LevelLabel(text = "LEVEL $gameLevel")
+            Text(
+                text = "Потягни зернятка до курчати та бережи його від каміння й жаб!",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = Color(0xFF8C5A2E),
+                    lineHeight = 22.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                ),
+                textAlign = TextAlign.Center
+            )
+
+            if (lastScore != null) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "Минулого разу: $lastScore зернят",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color(0xFF6D3B1A),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+            }
         }
     }
 }
 
-/* --------------------- Components --------------------- */
-
 @Composable
-private fun GameTitle(modifier: Modifier = Modifier) {
+private fun LogoTitle() {
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(68.dp)
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFFFFF176), Color(0xFFFFD54F), Color(0xFFFFB300)),
+                            radius = 100f
+                        ),
+                        shape = MaterialTheme.shapes.large
+                    )
+            )
+            GradientOutlinedText(
+                text = "Feed the Chick",
+                fontSize = 42.sp,
+                gradientColors = listOf(Color(0xFFFFF4C2), Color(0xFFFFC66E))
+            )
+        }
 
+        Text(
+            text = "Двір ферми чекає на турботливого гравця!",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = Color(0xFF8C5A2E),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        )
     }
 }
-

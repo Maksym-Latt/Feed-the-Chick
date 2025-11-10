@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.data.settings
+package com.manacode.feedthechick.data.settings
 
 import android.content.SharedPreferences
 import javax.inject.Inject

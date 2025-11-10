@@ -1,4 +1,4 @@
-package com.manacode.eggmagnet.ui.main.splashscreen
+package com.manacode.feedthechick.ui.main.splashscreen
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +15,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.manacode.eggmagnet.R
-import com.manacode.eggmagnet.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.R
+import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import kotlinx.coroutines.delay
 
 @Composable

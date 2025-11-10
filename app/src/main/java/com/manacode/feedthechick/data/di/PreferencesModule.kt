@@ -1,9 +1,9 @@
-package com.manacode.eggmagnet.data.di
+package com.manacode.feedthechick.data.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.manacode.eggmagnet.data.settings.SettingsRepository
-import com.manacode.eggmagnet.data.settings.SettingsRepositoryImpl
+import com.manacode.feedthechick.data.settings.SettingsRepository
+import com.manacode.feedthechick.data.settings.SettingsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
