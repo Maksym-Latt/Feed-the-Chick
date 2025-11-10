@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,15 +27,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manacode.feedthechick.ui.main.component.FarmBackground
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
+import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 
 @Composable
 fun MenuScreen(
     onStartGame: () -> Unit,
-    lastScore: Int?
+    lastScore: Int?,
+    onOpenSettings: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         FarmBackground(modifier = Modifier.matchParentSize())
+
+        SecondaryIconButton(
+            onClick = onOpenSettings,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Open settings",
+                tint = Color.White,
+                modifier = Modifier.fillMaxSize(0.8f)
+            )
+        }
 
         Column(
             modifier = Modifier
