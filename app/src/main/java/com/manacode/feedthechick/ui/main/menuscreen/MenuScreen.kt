@@ -67,7 +67,7 @@ fun MenuScreen(
                 painter = painterResource(id = R.drawable.title),
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth(0.8f),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(16.dp))

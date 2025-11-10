@@ -14,15 +14,25 @@
         android:theme="@style/Theme.FeedtheChick"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.splashscreen.SplashActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.FeedtheChick">
+            android:resizeableActivity="false"
+            android:supportsPictureInPicture="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FeedtheChick"
+            android:resizeableActivity="false"
+            android:supportsPictureInPicture="false">
         </activity>
     </application>
 

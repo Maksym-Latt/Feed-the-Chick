@@ -49,13 +49,13 @@ fun SecondaryIconButton(
 
     val gradient = if (!pressed) {
         Brush.verticalGradient(
-            0f to Color(0xFF49FFE9),
-            1f to Color(0xFF007965)
+            0f to Color(0xFFFFD700), // Яркий золотой
+            1f to Color(0xFFD4AF37)  // Классический золотой
         )
     } else {
         Brush.verticalGradient(
-            0f to Color(0xFF36B5A6),
-            1f to Color(0xFF025244)
+            0f to Color(0xFFCFB53B), // Темный золотой
+            1f to Color(0xFF996515)  // Золотисто-коричневый
         )
     }
 
