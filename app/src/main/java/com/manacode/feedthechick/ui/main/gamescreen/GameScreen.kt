@@ -8,7 +8,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -59,172 +57,78 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.Dp
 import com.manacode.feedthechick.R
-import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedTextShort
 import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
-import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
+import com.manacode.feedthechick.ui.main.gamescreen.engine.ChickState
+import com.manacode.feedthechick.ui.main.gamescreen.engine.GameEvent
+import com.manacode.feedthechick.ui.main.gamescreen.engine.ItemType
+import com.manacode.feedthechick.ui.main.gamescreen.engine.SpawnedItem
+import com.manacode.feedthechick.ui.main.gamescreen.engine.Viewport
+import com.manacode.feedthechick.ui.main.gamescreen.overlay.GameSettingsOverlay
+import com.manacode.feedthechick.ui.main.gamescreen.overlay.IntroOverlay
+import com.manacode.feedthechick.ui.main.gamescreen.overlay.WinOverlay
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import kotlin.random.Random
-private const val INITIAL_SPAWN_DELAY = 1600L
-private const val MIN_SPAWN_DELAY = 520L
 
+// ----------------------- Composable -----------------------
 @Composable
 fun GameScreen(
     onExitToMenu: (Int) -> Unit,
+    viewModel: GameViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
 
-    // ----------------------- State -----------------------
-    var score by remember { mutableIntStateOf(0) }
-    var lives by remember { mutableIntStateOf(3) }
-    var running by remember { mutableStateOf(false) }
-    var showIntro by remember { mutableStateOf(true) }
-    var showSettingsOverlay by remember { mutableStateOf(false) }
-    var showWinOverlay by remember { mutableStateOf(false) }
-    var spawnDelay by remember { mutableLongStateOf(INITIAL_SPAWN_DELAY) }
-    val items = remember { mutableStateListOf<SpawnedItem>() }
-    var nextItemId by remember { mutableIntStateOf(0) }
-    var resetKey by remember { mutableIntStateOf(0) }
-    var chickState by remember { mutableStateOf(ChickState.Idle) }
-
-    val toneGenerator = remember { ToneGenerator(AudioManager.STREAM_MUSIC, 70) }
+    // ----------------------- Audio -----------------------
+    val toneGenerator = remember { android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 70) }
     DisposableEffect(Unit) { onDispose { toneGenerator.release() } }
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                GameEvent.Cluck -> toneGenerator.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 150)
+            }
+        }
+    }
 
-    fun playCluck() { toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP2, 150) }
+    // ----------------------- State -----------------------
+    val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(chickState) {
-        if (chickState != ChickState.Idle) {
+    LaunchedEffect(state.chickState) {
+        if (state.chickState != ChickState.Idle) {
             delay(1000)
-            chickState = ChickState.Idle
+            viewModel.acknowledgeChickIdle()
         }
     }
-
-    fun resetGame() {
-        items.clear()
-        lives = 3
-        score = 0
-        spawnDelay = INITIAL_SPAWN_DELAY
-        showIntro = false
-        showSettingsOverlay = false
-        showWinOverlay = false
-        running = true
-        resetKey++
-        chickState = ChickState.Idle
-    }
-
-    fun registerMistake() {
-        lives = (lives - 1).coerceAtLeast(0)
-        chickState = ChickState.Cry
-        if (lives <= 0) {
-            running = false
-            items.clear()
-            showSettingsOverlay = false
-            showWinOverlay = true
-            showIntro = false
-        }
-    }
-
-    fun registerSuccess() {
-        score += 1
-        spawnDelay = maxOf(MIN_SPAWN_DELAY, (spawnDelay * 0.92f).toLong())
-        playCluck()
-        chickState = ChickState.Happy
-    }
-
-    BackHandler(enabled = true) {
-        when {
-            showSettingsOverlay -> {
-                showSettingsOverlay = false
-                if (!showIntro && !showWinOverlay) running = true
-            }
-            showWinOverlay -> {
-            }
-            else -> {
-                running = false
-                onExitToMenu(score)
-            }
-        }
-    }
-
 
     // ----------------------- Layout -----------------------
     Surface(color = MaterialTheme.colorScheme.background) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 
             val density = LocalDensity.current
-            val fieldHeight = maxHeight
             val fieldWidth = maxWidth
+            val fieldHeight = maxHeight
             val fieldWidthPx = with(density) { fieldWidth.toPx() }
             val fieldHeightPx = with(density) { fieldHeight.toPx() }
-            val maxItems = 8
+
             var mouthBounds by remember { mutableStateOf<Rect?>(null) }
 
-            // ----------------------- Spawn -----------------------
-            fun spawnItem() {
-                if (!running) return
-                val type = ItemType.random()
-                val size = type.size
-                val sizePx = with(density) { size.toPx() }
-                val horizontalPadding = with(density) { 24.dp.toPx() }
-                val verticalPadding = with(density) { 24.dp.toPx() }
-                val verticalLimit = fieldHeightPx * 0.7f
-                val xRange = (fieldWidthPx - horizontalPadding * 2 - sizePx).coerceAtLeast(0f)
-                val yRange = (verticalLimit - verticalPadding - sizePx).coerceAtLeast(0f)
-                if (xRange <= 0f || yRange <= 0f) return
-
-                val spacing = with(density) { 12.dp.toPx() }
-                var placedItem: SpawnedItem? = null
-
-                repeat(24) {
-                    val startX = horizontalPadding + Random.nextFloat() * xRange
-                    val startY = verticalPadding + Random.nextFloat() * yRange
-                    val candidateRect = Rect(
-                        left = startX - spacing,
-                        top = startY - spacing,
-                        right = startX + sizePx + spacing,
-                        bottom = startY + sizePx + spacing
-                    )
-                    val overlapsExisting = items.any { existing ->
-                        candidateRect.overlaps(existing.bounds(spacing))
-                    }
-                    if (!overlapsExisting) {
-                        placedItem = SpawnedItem(
-                            id = nextItemId++,
-                            type = type,
-                            size = size,
-                            sizePx = sizePx,
-                            startOffset = Offset(startX, startY),
-                            spawnedAt = System.currentTimeMillis()
+            LaunchedEffect(fieldWidthPx, fieldHeightPx) {
+                viewModel.bindSpawner(
+                    spawnTick = {
+                        val vp = Viewport(
+                            widthPx = fieldWidthPx,
+                            heightPx = fieldHeightPx,
+                            horizontalPaddingPx = with(density) { 24.dp.toPx() },
+                            verticalPaddingPx = with(density) { 24.dp.toPx() },
+                            verticalLimitRatio = 0.7f
                         )
-                        return@repeat
+                        viewModel.spawnTick(vp, density)
                     }
-                }
-
-                val newItem = placedItem ?: return
-                items.add(newItem)
-
-                if (items.size > maxItems) {
-                    val removed = items.removeAt(0)
-                    if (removed.type == ItemType.Seed) registerMistake()
-                }
+                )
             }
 
-            // ----------------------- Spawn loop -----------------------
-            LaunchedEffect(running, resetKey) {
-                if (!running) return@LaunchedEffect
-                spawnItem()
-                while (running) {
-                    val delayMillis = spawnDelay
-                    delay(delayMillis)
-                    if (!running) break
-                    spawnItem()
-                }
-            }
-
-            // ----------------------- Background -----------------------
             Image(
                 painter = painterResource(id = R.drawable.bg_game),
                 contentDescription = null,
@@ -232,7 +136,6 @@ fun GameScreen(
                 contentScale = ContentScale.Crop
             )
 
-            // ----------------------- Header -----------------------
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,11 +145,8 @@ fun GameScreen(
                 verticalAlignment = Alignment.Top
             ) {
                 SecondaryIconButton(
-                    onClick = {
-                        running = false
-                        showSettingsOverlay = true
-                    },
-                    modifier = Modifier.size(52.dp)
+                    onClick = { viewModel.pauseAndOpenSettings() },
+                    modifier = Modifier.size(62.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
@@ -255,147 +155,81 @@ fun GameScreen(
                         modifier = Modifier.fillMaxSize(0.8f)
                     )
                 }
-
                 Scoreboard(
-                    score = score,
-                    lives = lives,
+                    score = state.score,
+                    lives = state.lives,
                     modifier = Modifier.wrapContentWidth(Alignment.End)
                 )
             }
 
-            // ----------------------- Chicken -----------------------
             Chick(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 40.dp)
                     .size(fieldWidth * 0.7f),
-                state = chickState,
+                state = state.chickState,
                 onMouthMeasured = { mouthBounds = it }
             )
 
-            // ----------------------- Items -----------------------
-            items.forEach { item ->
+            state.items.forEach { item ->
                 key(item.id) {
                     DraggableItem(
                         item = item,
-                        onReleased = { releasedItem, centerPoint ->
-                            items.removeAll { it.id == releasedItem.id }
+                        onReleased = { released, center ->
+                            viewModel.removeItem(released.id)
                             val mouth = mouthBounds
-                            if (mouth != null && mouth.contains(centerPoint)) {
-                                if (releasedItem.type == ItemType.Seed) registerSuccess()
-                                else registerMistake()
+                            if (mouth != null && mouth.contains(center)) {
+                                if (released.type == ItemType.Seed) viewModel.registerSuccess()
+                                else viewModel.registerMistake()
                             } else {
-                                if (releasedItem.type == ItemType.Seed) registerMistake()
+                                if (released.type == ItemType.Seed) viewModel.registerMistake()
                             }
                         }
                     )
                 }
             }
 
-            // ----------------------- Intro -----------------------
             AnimatedVisibility(
-                visible = showIntro,
+                visible = state.showIntro,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.zIndex(10f)
             ) {
-                IntroOverlay(onStart = { resetGame() })
+                IntroOverlay(onStart = { viewModel.reset() })
             }
 
-            // ----------------------- Settings -----------------------
             AnimatedVisibility(
-                visible = showSettingsOverlay,
+                visible = state.showSettings,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.zIndex(15f)
             ) {
                 GameSettingsOverlay(
-                    onResume = {
-                        showSettingsOverlay = false
-                        if (!showIntro && !showWinOverlay) running = true
-                    },
-                    onRetry = {
-                        showSettingsOverlay = false
-                        resetGame()
-                    },
-                    onHome = {
-                        showSettingsOverlay = false
-                        running = false
-                        onExitToMenu(score)
-                    }
+                    onResume = { viewModel.resumeFromSettings() },
+                    onRetry = { viewModel.reset() },
+                    onHome = { viewModel.closeSettingsToHome(onExitToMenu) }
                 )
             }
 
-            // ----------------------- Win Overlay -----------------------
             AnimatedVisibility(
-                visible = showWinOverlay,
+                visible = state.showWin,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.zIndex(20f)
             ) {
                 WinOverlay(
-                    score = score,
-                    onRetry = {
-                        showWinOverlay = false
-                        resetGame()
-                    },
-                    onHome = {
-                        showWinOverlay = false
-                        running = false
-                        onExitToMenu(score)
-                    }
+                    score = state.score,
+                    onSupport = { /* открыть донат/поддержку */ },
+                    onHome = { onExitToMenu(state.score) }
                 )
             }
         }
     }
 }
 
-// ----------------------- SpawnedItem model -----------------------
-private data class SpawnedItem(
-    val id: Int,
-    val type: ItemType,
-    val size: Dp,
-    val sizePx: Float,
-    val startOffset: Offset,
-    val spawnedAt: Long,
-)
 
-private fun SpawnedItem.bounds(extra: Float = 0f): Rect {
-    return Rect(
-        left = startOffset.x - extra,
-        top = startOffset.y - extra,
-        right = startOffset.x + sizePx + extra,
-        bottom = startOffset.y + sizePx + extra
-    )
-}
-
-// ----------------------- Types -----------------------
-private enum class ItemType(
-    val size: Dp,
-    @DrawableRes val drawableRes: Int,
-    val contentDescription: String,
-) {
-    Seed(72.dp, R.drawable.item_gold_corn, "Golden corn"),
-    Rock(72.dp, R.drawable.item_stone, "Stone"),
-    Frog(86.dp, R.drawable.item_frog, "Frog");
-
-    companion object {
-        fun random(): ItemType {
-            val roll = Random.nextFloat()
-            return when {
-                roll < 0.6f -> Seed
-                roll < 0.8f -> Rock
-                else -> Frog
-            }
-        }
-    }
-}
-
-private enum class ChickState { Idle, Happy, Cry }
-
-// ----------------------- Scoreboard -----------------------
 @Composable
-private fun Scoreboard(
+fun Scoreboard(
     score: Int,
     lives: Int,
     modifier: Modifier = Modifier
@@ -427,9 +261,9 @@ private fun Scoreboard(
     }
 }
 
-// ----------------------- Chicken -----------------------
+// ----------------------- Chick -----------------------
 @Composable
-private fun Chick(
+fun Chick(
     modifier: Modifier,
     state: ChickState,
     onMouthMeasured: (Rect) -> Unit,
@@ -440,7 +274,6 @@ private fun Chick(
         ChickState.Happy -> R.drawable.chicken_happy
         ChickState.Cry -> R.drawable.chicken_cry
     }
-
     Box(
         modifier = modifier.onGloballyPositioned { layout ->
             val bounds = layout.boundsInRoot()
@@ -456,7 +289,7 @@ private fun Chick(
     ) {
         Image(
             painter = painterResource(id = imageRes),
-            contentDescription = "Chicken",
+            contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit
         )
@@ -465,13 +298,12 @@ private fun Chick(
 
 // ----------------------- DraggableItem -----------------------
 @Composable
-private fun DraggableItem(
+fun DraggableItem(
     item: SpawnedItem,
     onReleased: (SpawnedItem, Offset) -> Unit,
 ) {
     var offset by remember(item.id) { mutableStateOf(item.startOffset) }
     var isDragging by remember(item.id) { mutableStateOf(false) }
-    val sizePx = item.sizePx
     val scale by animateFloatAsState(if (isDragging) 1.12f else 1f, label = "drag-scale")
 
     val dragModifier = Modifier
@@ -488,7 +320,7 @@ private fun DraggableItem(
                 },
                 onDragEnd = {
                     isDragging = false
-                    onReleased(item, offset + Offset(sizePx / 2f, sizePx / 2f))
+                    onReleased(item, offset + Offset(item.sizePx / 2f, item.sizePx / 2f))
                 },
                 onDragCancel = {
                     isDragging = false

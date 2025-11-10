@@ -76,7 +76,7 @@ fun MenuScreen(
                 painter = painterResource(id = R.drawable.chicken_win),
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth(0.65f),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(32.dp))

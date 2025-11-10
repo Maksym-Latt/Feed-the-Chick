@@ -1,4 +1,4 @@
-package com.manacode.feedthechick.ui.main.gamescreen
+package com.manacode.feedthechick.ui.main.gamescreen.overlay
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

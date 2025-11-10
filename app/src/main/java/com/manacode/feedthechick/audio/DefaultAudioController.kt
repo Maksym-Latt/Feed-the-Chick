@@ -16,7 +16,7 @@ class DefaultAudioController @Inject constructor(
 ) : AudioController {
 
     private enum class MusicChannel { MENU, GAME }
-    private enum class SoundEffect { MAGNET_PURCHASE, NOT_ENOUGH_MONEY, EGG, ROCK, BOMB, WIN, LOSE }
+    private enum class SoundEffect { CORN, FAIL, WIN }
 
     private val soundPool: SoundPool = SoundPool.Builder()
         .setMaxStreams(6)
@@ -29,13 +29,9 @@ class DefaultAudioController @Inject constructor(
         .build()
 
     private val effectToName = mapOf(
-        SoundEffect.MAGNET_PURCHASE to "sfx_buy_magnet",
-        SoundEffect.NOT_ENOUGH_MONEY to "sfx_no_money",
-        SoundEffect.EGG to "sfx_pickup_egg",
-        SoundEffect.ROCK to "sfx_pickup_rock",
-        SoundEffect.BOMB to "sfx_hit_bomb",
-        SoundEffect.WIN to "sfx_game_win",
-        SoundEffect.LOSE to "sfx_game_lose"
+        SoundEffect.CORN to "sfx_buy_magnet",
+        SoundEffect.FAIL to "sfx_fail",
+        SoundEffect.WIN to "sfx_yummy",
     )
 
     private val effectToResId = effectToName.mapValues { resolveRaw(it.value) }
@@ -129,10 +125,6 @@ class DefaultAudioController @Inject constructor(
 
     override fun playGameWin() {
         playEffect(SoundEffect.WIN)
-    }
-
-    override fun playGameLose() {
-        playEffect(SoundEffect.LOSE)
     }
 
     private fun playMusic(channel: MusicChannel) {
