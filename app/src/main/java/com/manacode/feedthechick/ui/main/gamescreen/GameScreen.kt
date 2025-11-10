@@ -26,6 +26,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +61,7 @@ import androidx.compose.ui.zIndex
 import com.manacode.feedthechick.ui.main.component.FarmBackground
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedText
 import com.manacode.feedthechick.ui.main.component.OrangePrimaryButton
+import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.component.StartPrimaryButton
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -72,6 +76,7 @@ fun GameScreen(
     var running by remember { mutableStateOf(false) }
     var showIntro by remember { mutableStateOf(true) }
     var showGameOver by remember { mutableStateOf(false) }
+    var showSettingsOverlay by remember { mutableStateOf(false) }
     var spawnDelay by remember { mutableLongStateOf(1600L) }
     val items = remember { mutableStateListOf<SpawnedItem>() }
     var nextItemId by remember { mutableIntStateOf(0) }
@@ -95,6 +100,7 @@ fun GameScreen(
         spawnDelay = 1600L
         showIntro = false
         showGameOver = false
+        showSettingsOverlay = false
         running = true
         resetKey++
     }
@@ -103,6 +109,7 @@ fun GameScreen(
         running = false
         showGameOver = true
         items.clear()
+        showSettingsOverlay = false
     }
 
     fun registerMistake() {
@@ -119,8 +126,15 @@ fun GameScreen(
     }
 
     BackHandler(enabled = true) {
-        running = false
-        onExitToMenu(score)
+        if (showSettingsOverlay) {
+            showSettingsOverlay = false
+            if (!showIntro && !showGameOver) {
+                running = true
+            }
+        } else {
+            running = false
+            onExitToMenu(score)
+        }
     }
 
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -182,6 +196,28 @@ fun GameScreen(
                     .padding(horizontal = 24.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    SecondaryIconButton(
+                        onClick = {
+                            running = false
+                            showSettingsOverlay = true
+                        },
+                        modifier = Modifier.size(52.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Pause and open settings",
+                            tint = Color.White,
+                            modifier = Modifier.fillMaxSize(0.8f)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Scoreboard(score = score, lives = lives)
             }
 
@@ -225,6 +261,30 @@ fun GameScreen(
                 exit = fadeOut()
             ) {
                 IntroOverlay(onStart = { resetGame() })
+            }
+
+            AnimatedVisibility(
+                visible = showSettingsOverlay,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                GameSettingsOverlay(
+                    onResume = {
+                        showSettingsOverlay = false
+                        if (!showIntro && !showGameOver) {
+                            running = true
+                        }
+                    },
+                    onRetry = {
+                        showSettingsOverlay = false
+                        resetGame()
+                    },
+                    onHome = {
+                        showSettingsOverlay = false
+                        running = false
+                        onExitToMenu(score)
+                    }
+                )
             }
 
             AnimatedVisibility(
@@ -315,6 +375,8 @@ private fun Chick(
     modifier: Modifier,
     onMouthMeasured: (Rect) -> Unit,
 ) {
+    val density = LocalDensity.current
+
     Box(modifier = modifier) {
         androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
             val bodyCenter = Offset(size.width / 2f, size.height * 0.6f)
@@ -341,7 +403,17 @@ private fun Chick(
                 .size(width = 140.dp, height = 62.dp)
                 .clip(androidx.compose.foundation.shape.RoundedCornerShape(40.dp))
                 .background(Color(0xFFFFA726))
-                .onGloballyPositioned { layout -> onMouthMeasured(layout.boundsInRoot()) }
+                .onGloballyPositioned { layout ->
+                    val bounds = layout.boundsInRoot()
+                    val extra = with(density) { 16.dp.toPx() }
+                    val expanded = Rect(
+                        left = bounds.left - extra,
+                        top = bounds.top - extra,
+                        right = bounds.right + extra,
+                        bottom = bounds.bottom + extra
+                    )
+                    onMouthMeasured(expanded)
+                }
         )
 
         Box(
