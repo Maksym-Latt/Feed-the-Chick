@@ -7,12 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.manacode.feedthechick.audio.AudioController
 import com.manacode.feedthechick.ui.main.root.AppRoot
 import com.manacode.feedthechick.ui.theme.FeedtheChickTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var audio: AudioController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -30,6 +35,16 @@ class MainActivity : ComponentActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemBars()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        audio.resumeMusic()
+    }
+
+    override fun onPause() {
+        audio.pauseMusic()
+        super.onPause()
     }
 
     private fun hideSystemBars() {

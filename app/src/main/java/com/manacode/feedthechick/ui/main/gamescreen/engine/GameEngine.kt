@@ -80,7 +80,9 @@ data class GameState(
 )
 
 sealed interface GameEvent {
-    data object Cluck : GameEvent
+    data object FeedSuccess : GameEvent
+    data object Mistake : GameEvent
+    data object GameWon : GameEvent
 }
 
 // ----------------------- Engine -----------------------
@@ -145,14 +147,14 @@ class GameEngine {
             spawnDelay = newDelay,
             chickState = ChickState.Happy
         )
-        _events.tryEmit(GameEvent.Cluck)
+        _events.tryEmit(GameEvent.FeedSuccess)
     }
 
     fun registerMistake() {
         val s = _state.value
         val newLives = (s.lives - 1).coerceAtLeast(0)
-        if (newLives <= 0) {
-            _state.value = s.copy(
+        val endState = if (newLives <= 0) {
+            s.copy(
                 lives = 0,
                 running = false,
                 items = emptyList(),
@@ -161,7 +163,12 @@ class GameEngine {
                 chickState = ChickState.Cry
             )
         } else {
-            _state.value = s.copy(lives = newLives, chickState = ChickState.Cry)
+            s.copy(lives = newLives, chickState = ChickState.Cry)
+        }
+        _state.value = endState
+        _events.tryEmit(GameEvent.Mistake)
+        if (endState.showWin) {
+            _events.tryEmit(GameEvent.GameWon)
         }
     }
 
@@ -218,12 +225,14 @@ class GameEngine {
         val newItem = placed ?: return
         var newItems = s.items + newItem
         var newLives = s.lives
+        var mistake = false
 
         if (newItems.size > maxItems) {
             val removed = newItems.first()
             newItems = newItems.drop(1)
             if (removed.type == ItemType.Seed) {
                 newLives = (newLives - 1).coerceAtLeast(0)
+                mistake = true
             }
         }
 
@@ -246,5 +255,11 @@ class GameEngine {
         }
 
         _state.value = endState
+        if (mistake) {
+            _events.tryEmit(GameEvent.Mistake)
+            if (endState.showWin) {
+                _events.tryEmit(GameEvent.GameWon)
+            }
+        }
     }
 }

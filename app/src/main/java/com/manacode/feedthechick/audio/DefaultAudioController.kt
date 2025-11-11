@@ -29,9 +29,9 @@ class DefaultAudioController @Inject constructor(
         .build()
 
     private val effectToName = mapOf(
-        SoundEffect.CORN to "sfx_buy_magnet",
+        SoundEffect.CORN to "sfx_yummy",
         SoundEffect.FAIL to "sfx_fail",
-        SoundEffect.WIN to "sfx_yummy",
+        SoundEffect.WIN to "sfx_game_win",
     )
 
     private val effectToResId = effectToName.mapValues { resolveRaw(it.value) }
@@ -123,8 +123,16 @@ class DefaultAudioController @Inject constructor(
         soundVolume = percent.toVolume()
     }
 
+    override fun playGameFeed() {
+        playEffect(SoundEffect.CORN)
+    }
+
     override fun playGameWin() {
         playEffect(SoundEffect.WIN)
+    }
+
+    override fun playGameLose() {
+        playEffect(SoundEffect.FAIL)
     }
 
     private fun playMusic(channel: MusicChannel) {

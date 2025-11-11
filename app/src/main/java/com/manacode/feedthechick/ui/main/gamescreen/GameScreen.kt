@@ -1,8 +1,5 @@
 package com.manacode.feedthechick.ui.main.gamescreen
 
-import android.media.AudioManager
-import android.media.ToneGenerator
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
@@ -28,12 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.key
@@ -60,6 +53,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.Dp
 import com.manacode.feedthechick.R
+import com.manacode.feedthechick.audio.rememberAudioController
 import com.manacode.feedthechick.ui.main.component.GradientOutlinedTextShort
 import com.manacode.feedthechick.ui.main.component.SecondaryIconButton
 import com.manacode.feedthechick.ui.main.gamescreen.engine.ChickState
@@ -82,12 +76,13 @@ fun GameScreen(
 ) {
 
     // ----------------------- Audio -----------------------
-    val toneGenerator = remember { android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 70) }
-    DisposableEffect(Unit) { onDispose { toneGenerator.release() } }
-    LaunchedEffect(Unit) {
+    val audio = rememberAudioController()
+    LaunchedEffect(audio) {
         viewModel.events.collect { event ->
             when (event) {
-                GameEvent.Cluck -> toneGenerator.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 150)
+                GameEvent.FeedSuccess -> audio.playGameFeed()
+                GameEvent.Mistake -> audio.playGameLose()
+                GameEvent.GameWon -> audio.playGameWin()
             }
         }
     }

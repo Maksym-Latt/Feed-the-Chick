@@ -10,6 +10,7 @@ interface AudioController {
     fun setMusicVolume(percent: Int)
     fun setSoundVolume(percent: Int)
 
+    fun playGameFeed()
     fun playGameWin()
     fun playGameLose()
 }

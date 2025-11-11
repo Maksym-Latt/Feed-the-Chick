@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.manacode.feedthechick.audio.rememberAudioController
 import com.manacode.feedthechick.ui.main.gamescreen.GameScreen
 import com.manacode.feedthechick.ui.main.menuscreen.MainViewModel
 import com.manacode.feedthechick.ui.main.menuscreen.MenuScreen
@@ -27,11 +28,16 @@ fun AppRoot(
     val ui by vm.ui.collectAsStateWithLifecycle()
     var showMenuSettings by rememberSaveable { mutableStateOf(false) }
     var showMenuPrivacy by rememberSaveable { mutableStateOf(false) }
+    val audio = rememberAudioController()
 
     LaunchedEffect(ui.screen) {
         if (ui.screen != MainViewModel.Screen.Menu) {
             showMenuSettings = false
             showMenuPrivacy = false
+        }
+        when (ui.screen) {
+            MainViewModel.Screen.Menu -> audio.playMenuMusic()
+            MainViewModel.Screen.Game -> audio.playGameMusic()
         }
     }
 
