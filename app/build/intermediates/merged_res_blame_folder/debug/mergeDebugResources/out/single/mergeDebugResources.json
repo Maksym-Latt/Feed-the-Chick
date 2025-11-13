@@ -1,0 +1,154 @@
+[
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_item_frog.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/item_frog.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_item_egg.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/item_egg.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/xml_backup_rules.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/font_poppins_extra_bold.ttf.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/font/poppins_extra_bold.ttf"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_chicken_idle.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/chicken_idle.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-mdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_title.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/title.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-hdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_item_stone.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/item_stone.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_chicken_win.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/chicken_win.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_item_gold_corn.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/item_gold_corn.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/raw_sfx_fail.mp3.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/raw/sfx_fail.mp3"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/raw_sfx_game_win.mp3.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/raw/sfx_game_win.mp3"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_bg_menu.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/bg_menu.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_bg_game.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/bg_game.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/raw_music_menu.mp3.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/raw/music_menu.mp3"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_chicken_happy.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/chicken_happy.png"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/xml_data_extraction_rules.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/raw_music_game.mp3.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/raw/music_game.mp3"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/raw_sfx_yummy.mp3.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/raw/sfx_yummy.mp3"
+    },
+    {
+        "merged": "com.manacode.feedthechick.app-debug-60:/drawable_chicken_cry.png.flat",
+        "source": "com.manacode.feedthechick.app-main-62:/drawable/chicken_cry.png"
+    }
+]
